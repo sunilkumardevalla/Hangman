@@ -12,6 +12,8 @@ class ViewController: UIViewController {
     var answerLabel: UILabel!
     var scoreLabel: UILabel!
     var letterButtons = [UIButton]()
+    var lettersUsed = [String]()
+    var currentWord = ""
     let letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
     
     override func loadView() {
@@ -59,7 +61,8 @@ class ViewController: UIViewController {
             buttonsView.heightAnchor.constraint(equalToConstant: 320),
             buttonsView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             buttonsView.topAnchor.constraint(equalTo: wordCountLabel.bottomAnchor, constant: 20),
-            buttonsView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            buttonsView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
+            buttonsView.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor, constant: -10),
             buttonsView.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor, constant: -20)
         ])
         
@@ -93,11 +96,32 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        
+        loadWords()
     }
     
-    @objc func letterTapped() {
+    @objc func letterTapped(_ sender: UIButton) {
+        guard let buttonTitle = sender.titleLabel?.text else { return }
         
+        lettersUsed.append(buttonTitle)
+        sender.isHidden = true
+        
+        
+        
+    }
+    
+    @objc func loadWords() {
+        if let wordFileURL = Bundle.main.url(forResource: "words", withExtension: "txt") {
+            if let wordContents = try? String(contentsOf: wordFileURL) {
+                var words = wordContents.components(separatedBy: "\n")
+                words.shuffle()
+                
+                currentWord = words.randomElement()!.uppercased()
+            }
+        }
+        
+        answerLabel.text = String(repeating: "?", count: currentWord.count)
+        wordCountLabel.text = "\(currentWord.count) Letters"
     }
 
 
