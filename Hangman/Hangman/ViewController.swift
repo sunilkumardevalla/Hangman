@@ -16,6 +16,19 @@ class ViewController: UIViewController {
     var currentWord = ""
     let letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
     
+    
+    var labelStr = "" {
+        didSet {
+            answerLabel.text = "\(labelStr)"
+        }
+    }
+    
+    var score = 0 {
+        didSet {
+            scoreLabel.text = "\(score)"
+        }
+    }
+    
     override func loadView() {
         view = UIView()
         view.backgroundColor = .white
@@ -106,8 +119,30 @@ class ViewController: UIViewController {
         lettersUsed.append(buttonTitle)
         sender.isHidden = true
         
+        var promptWord = ""
         
+        for letter in currentWord {
+            let strLetter = String(letter)
+            
+            if lettersUsed.contains(String(letter)) {
+                promptWord += strLetter
+            } else {
+                promptWord += "?"
+            }
+        }
         
+        if promptWord == labelStr {
+//            errorMessage(title: "", message: "The letter you pressed is not in the word")
+            score -= 1
+        } else {
+            labelStr = promptWord
+            score += 1
+        }
+
+        if labelStr.contains("?") != true {
+//            errorMessage(title: "Congrats!", message: "Next Level!")
+            loadWords()
+        }
     }
     
     @objc func loadWords() {
@@ -117,12 +152,30 @@ class ViewController: UIViewController {
                 words.shuffle()
                 
                 currentWord = words.randomElement()!.uppercased()
+                
             }
         }
         
         answerLabel.text = String(repeating: "?", count: currentWord.count)
         wordCountLabel.text = "\(currentWord.count) Letters"
+        
+        for button in letterButtons {
+            button.isHidden = false
+        }
+        
+        lettersUsed.removeAll()
     }
+    
+//    func errorMessage(title: String, message: String) {
+//        let ac = UIAlertController(title: title, message: message, preferredStyle: .alert)
+//        self.present(ac, animated: true, completion: nil)
+//
+//        // Dismiss the alert for 1 second
+//        let when = DispatchTime.now() + 1
+//        DispatchQueue.main.asyncAfter(deadline: when){
+//          ac.dismiss(animated: true, completion: nil)
+//        }
+//    }
 
 
 }
